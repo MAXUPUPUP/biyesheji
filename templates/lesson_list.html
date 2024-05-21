@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>课程列表</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 40px;
+            color: #333;
+        }
+        h1 {
+            color: #0a48b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #0a48b3;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #e8e8e8;
+        }
+        input[type="file"] {
+            margin-top: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        a {
+            color: #0a48b3;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>课程列表</h1>
+    <table>
+        <tr>
+            <th>课程名</th>
+            <th>课程简介</th>
+            <th>操作</th>
+        </tr>
+        {% for lesson in lessons %}
+        <tr>
+            <td>{{ lesson.lname }}</td>
+            <td>{{ lesson.jianjie }}</td>
+            <td>
+                <form action="{% url 'upload' lesson.id %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file">
+                    <button type="submit">上传文件</button>
+                </form>
+                <a href="{% url 'scores' lesson.id %}">查看得分记录</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

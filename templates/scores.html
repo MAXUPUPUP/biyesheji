@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>评分与评语记录</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>评分与评语记录</h1>
+    <table>
+        <tr>
+            <th>学生</th>
+            <th>得分</th>
+            <th>评语</th>
+            <th>重复率</th>
+            <th>查看原文</th>
+        </tr>
+        {% for score in scores %}
+        <tr>
+            <td>{{ score.student }}</td>
+            <td>{{ score.score }}</td>
+            <td>{{ score.comment }}</td>
+            <td>{{ score.chong }}%</td>
+            <td><a href="/{{ score.url }}" target="_blank">打开文档</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'lesson_list' %}">返回课程列表</a>
+</body>
+</html>
