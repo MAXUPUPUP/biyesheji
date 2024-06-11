@@ -3,27 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>register</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-image: url("/templates/sakura.jpg");
+            background-position: center center;
+            background-size: 100% 100%;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
         form {
             margin: 0 auto;
+            background-color: #ffffff;
             width: 300px;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
+
         }
         input[type="text"], input[type="password"] , input[type="password2"]{
-            width: 100%;
+            width: 90%;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
         input[type="submit"] {
-            width: 100%;
+            width: 98%;
             padding: 10px;
             background-color: #007bff;
             color: white;
@@ -39,11 +51,11 @@
 <body>
     <form action="/user/register/" method="post">
         {% csrf_token %}
-        <h2>Register</h2>
-        <input type="text" name="username" placeholder="Username" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <input type="password2" name="password2" placeholder="Password2" required><br>
-        <input type="submit" value="Register">
+        <h2>注册账号</h2>
+        <input type="text" name="username" placeholder="注册用户名" required><br>
+        <input type="password" name="password" placeholder="请输入密码" required><br>
+        <input type="password2" name="password2" placeholder="请再次输入密码" required><br>
+        <input type="submit" value="注册">
     </form>
   {% if messages %}
 

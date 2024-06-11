@@ -8,11 +8,12 @@ from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 from .models import Lesson
 import requests
+from django.shortcuts import redirect
 import json
 from http import HTTPStatus
-import dashscope
 import re
 import os
+import dashscope
 dashscope.api_key="sk-ed0c4bfbafb541a0812bda5b311cebdf"
 def get_access_token():
     """
@@ -37,58 +38,61 @@ def upload_file(request, id):
     if request.method == 'POST':
         uid = request.session.get('user_id')
 
-        if 'file' in request.FILES:
-            file = request.FILES['file']
-            if file.name.endswith('.docx'):
-                fs = FileSystemStorage()
-                filename = fs.save(file.name, file)
-                file_path = fs.path(filename)
 
-                doc = Document(file_path)
-                content = []
-                for paragraph in doc.paragraphs:
-                    content.append(paragraph.text)
+        if 'docx_files' in request.FILES:
+            files = request.FILES.getlist('docx_files')
+            #file = request.FILES['file']
+            for file in files:
+                if file.name.endswith('.docx'):
+                    fs = FileSystemStorage()
+                    filename = fs.save(file.name, file)
+                    file_path = fs.path(filename)
 
-                # 读取表格
-                for table in doc.tables:
-                    for row in table.rows:
-                        for cell in row.cells:
-                            content.append(cell.text)
-                content = ''.join(content)
+                    doc = Document(file_path)
+                    content = []
+                    for paragraph in doc.paragraphs:
+                        content.append(paragraph.text)
 
-                # 计算内容重复度
-                existing_texts = Shiyan.objects.filter(lid=id).values_list('text', flat=True)
-                similarity_scores = [difflib.SequenceMatcher(None, content, old_text).ratio() for old_text in existing_texts]
-                average_similarity = max(similarity_scores) if similarity_scores else 0
-                print(average_similarity)
-                # 处理文件内容
-                chuli_result, score = chuli(content)  # 假设chuli函数处理内容并返回结果和分数
-                ff=os.path.basename(file_path)
-                # 检查是否已有相同lid和uid的记录
-                existing_record = Shiyan.objects.filter(lid=id, uid=uid).first()
-                if existing_record:
-                    # 更新现有记录
-                    existing_record.pingyu = chuli_result
-                    existing_record.score = score
-                    existing_record.file = fs.url(filename)
-                    existing_record.text = content
-                    existing_record.chong = average_similarity
-                    existing_record.url=ff
-                    existing_record.save()
-                    return HttpResponse("文件已更新，处理结果: {chuli_result}")
-                else:
-                    # 创建新记录
-                    new_record = Shiyan(
-                        url=ff,
-                        lid=id,
-                        uid=uid,
-                        pingyu=chuli_result,
-                        score=score,
-                        file=fs.url(filename),
-                        text=content,
-                        chong=average_similarity
-                    )
-                    new_record.save()
+                    # 读取表格
+                    for table in doc.tables:
+                        for row in table.rows:
+                            for cell in row.cells:
+                                content.append(cell.text)
+                    content = ''.join(content)
+
+                    # 计算内容重复度
+                    existing_texts = Shiyan.objects.filter(lid=id).values_list('text', flat=True)
+                    similarity_scores = [difflib.SequenceMatcher(None, content, old_text).ratio() for old_text in existing_texts]
+                    average_similarity = max(similarity_scores) if similarity_scores else 0
+                    print(average_similarity)
+                    # 处理文件内容
+                    chuli_result, score = chuli(content)  #假设chuli函数处理内容并返回结果和分数
+                    ff=os.path.basename(file_path)
+                    # 检查是否已有相同lid和uid的记录
+                    existing_record = Shiyan.objects.filter(lid=id, uid=uid).first()
+                    if existing_record:
+                        # 更新现有记录
+                        existing_record.pingyu = chuli_result
+                        existing_record.score = score
+                        existing_record.file = fs.url(filename)
+                        existing_record.text = content
+                        existing_record.chong = average_similarity
+                        existing_record.url=ff
+                        existing_record.save()
+                        return HttpResponse("文件已更新，处理结果: {chuli_result}")
+                    else:
+                        # 创建新记录
+                        new_record = Shiyan(
+                            url=ff,
+                            lid=id,
+                            uid=uid,
+                            pingyu=chuli_result,
+                            score=score,
+                            file=fs.url(filename),
+                            text=content,
+                            chong=average_similarity
+                        )
+                        new_record.save()
                     return HttpResponse("文件已处理并保存，处理结果: {chuli_result}")
             else:
                 return HttpResponse("上传失败：只接受 .docx 文件。")
@@ -161,27 +165,19 @@ def chuli(content):
     # print(response.output)  # The output text
     # print(response.usage)  # The usage information
     score_match = re.search(r'总分为(\d+)分', response.output.text)
-
     # 检查是否匹配到分数
-
     if score_match:
-
         # 提取并打印总分
-
         total_score = score_match.group(1)
-
         print(f"提取的总分为：{total_score}分")
-
     else:
         total_score='暂未获取'
         print("未找到总分信息。")
-
     return response.output.text, total_score  # 返回评语和分数
 def view_scores(request, id):
     # 假设我们有一个模型 Score 来存储得分，与 Lesson 模型有关联
     # from .models import Score
     # scores = Score.objects.filter(lesson_id=id)
-
     # 为简单起见，这里我们用一个静态的数据示例
     experiments = Shiyan.objects.filter(lid=id,uid=request.session.get('user_id')).values('lid', 'uid', 'score', 'pingyu', 'chong', 'url')
     print(experiments)
@@ -190,9 +186,6 @@ def view_scores(request, id):
         {'student': experiment['uid'], 'score': experiment['score'], 'comment': experiment['pingyu'], 'chong': str(float(experiment['chong'])*100), 'url': experiment['url']}
         for experiment in experiments
     ]
-
     # 渲染HTML模板，传递scores列表
-
-
     return render(request, 'scores.html', {'scores': scores, 'lesson_id': id})
 

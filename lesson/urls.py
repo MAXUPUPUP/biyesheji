@@ -6,3 +6,6 @@ urlpatterns = [
     path('upload/<int:id>/', views.upload_file, name='upload'),
     path('scores/<int:id>/', views.view_scores, name='scores'),
 ]
+
+
+

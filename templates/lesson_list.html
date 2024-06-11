@@ -7,11 +7,18 @@
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f9;
+            background-image: url("/templates/sakura.jpg");
+            background-position: center center;
+            background-size: 100% 100%;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             margin: 40px;
             color: #333;
         }
         h1 {
-            color: #0a48b3;
+            color: blue;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
         }
         table {
             width: 100%;
@@ -30,6 +37,10 @@
         tr:nth-child(even) {
             background-color: #e8e8e8;
         }
+        tr:nth-child(odd){
+            background-color: lightyellow;
+        }
+
         input[type="file"] {
             margin-top: 5px;
         }
@@ -71,7 +82,8 @@
             <td>
                 <form action="{% url 'upload' lesson.id %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <input type="file" name="file">
+                    <!--<input type="file" name="file">-->
+                    <input type="file" name="docx_files" multiple>
                     <button type="submit">上传文件</button>
                 </form>
                 <a href="{% url 'scores' lesson.id %}">查看得分记录</a>

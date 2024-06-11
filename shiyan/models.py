@@ -7,13 +7,13 @@ class Shiyan(models.Model):
     # email = models.CharField(max_length=100)
     lid = models.CharField(max_length=100)
     uid = models.CharField(max_length=10)
-    pingyu=models.CharField(max_length=100)
-    score =models.CharField(max_length=100)
+    pingyu = models.CharField(max_length=500)
+    score = models.CharField(max_length=100)
     url = models.CharField(max_length=100)
     file = models.FileField(upload_to='shiyan')
-    chong=models.CharField(max_length=100)
-    text=models.TextField(max_length=10000)
-    datetime=models.DateTimeField(auto_now_add=True)
+    chong = models.CharField(max_length=100)
+    text = models.TextField(max_length=10000)
+    datetime = models.DateTimeField(auto_now_add=True)
     # TYPE_CHOICES = [
     #     (0, '可用'),
     #     (1, '禁用'),
